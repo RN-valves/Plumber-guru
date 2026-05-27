@@ -2,26 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Primary — Orange */
+    --primary: 24 95% 53%;           /* #F97316 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Background / Surface */
+    --background: 0 0% 100%;
+    --foreground: 20 14% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 10%;
+
+    --secondary: 30 20% 96%;
+    --secondary-foreground: 20 14% 10%;
+
+    --muted: 30 10% 94%;
+    --muted-foreground: 20 10% 45%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 10% 88%;
+    --input: 20 10% 88%;
+    --ring: 24 95% 53%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 20 14% 8%;
+    --foreground: 30 10% 96%;
+
+    --card: 20 14% 11%;
+    --card-foreground: 30 10% 96%;
+
+    --popover: 20 14% 11%;
+    --popover-foreground: 30 10% 96%;
+
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 20 14% 15%;
+    --secondary-foreground: 30 10% 96%;
+
+    --muted: 20 14% 18%;
+    --muted-foreground: 20 10% 60%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 14% 20%;
+    --input: 20 14% 20%;
+    --ring: 24 95% 53%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Orange gradient utility */
+  .gradient-orange {
+    background: linear-gradient(135deg, #F97316 0%, #ea580c 100%);
+  }
+
+  /* Container max width */
+  .container-pg {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
   }
 }
