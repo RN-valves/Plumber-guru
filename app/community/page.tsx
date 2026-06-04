@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 import {
   Trophy,
   MessageSquare,
@@ -125,6 +126,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export default function CommunityPage() {
+  const requireAuthAction = useRequireAuthAction();
   const [womenForm, setWomenForm] = useState({ name: "", phone: "", city: "" });
   const [womenSubmitted, setWomenSubmitted] = useState(false);
 
@@ -254,7 +256,7 @@ export default function CommunityPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  setWomenSubmitted(true);
+                  requireAuthAction(() => setWomenSubmitted(true));
                 }}
                 className="rounded-3xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-6 space-y-4"
               >

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ObjectId } from "mongodb";
 import { authOptions, calcProfileComplete } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
+import { CustomerDashboardView } from "@/components/dashboard/CustomerDashboardView";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 
 export const dynamic = "force-dynamic";
@@ -76,31 +77,36 @@ export default async function DashboardPage() {
 
   if (session.user.role === "customer") {
     return (
-      <div className="container-pg py-10">
-        <div className="rounded-3xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 p-8 text-center">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-            Customer Dashboard
-          </h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Namaste, {userName}! Find a plumber near you.
-          </p>
-          <a
-            href="/find-plumber"
-            className="mt-6 inline-flex rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold px-6 py-3"
-          >
-            Find Plumber
-          </a>
+      <div className="relative min-h-[calc(100vh-8rem)] bg-[#f8fafc] py-10 dark:bg-gray-950">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(30,58,138,0.06),_transparent_55%)]"
+          aria-hidden
+        />
+        <div className="container-pg relative">
+          <CustomerDashboardView
+            userName={userName}
+            phone={session.user.phone}
+          />
         </div>
       </div>
     );
   }
 
+  if (session.user.role === "admin") {
+    redirect("/admin");
+  }
+
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-8rem)] py-10">
-      <div className="container-pg">
+    <div className="relative min-h-[calc(100vh-8rem)] bg-[#f8fafc] py-10 dark:bg-gray-950">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(249,115,22,0.08),_transparent_55%)]"
+        aria-hidden
+      />
+      <div className="container-pg relative">
         <DashboardView
           userName={userName}
           phone={session.user.phone}
+          role={session.user.role}
           profileComplete={profileComplete}
           missingFields={missingFields}
         />

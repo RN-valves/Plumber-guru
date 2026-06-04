@@ -27,9 +27,7 @@ export function getMongoClientPromise(): Promise<MongoClient> {
 }
 
 /** @deprecated Use getMongoClientPromise() — kept for MongoDBAdapter */
-const clientPromise = uri
-  ? getMongoClientPromise()
-  : Promise.reject(new Error("Missing MONGODB_URI"));
+const clientPromise = getMongoClientPromise;
 
 export default clientPromise;
 

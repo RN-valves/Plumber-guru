@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CalendarDays, MessageCircle, Printer } from "lucide-react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 
 type QuoteItem = {
   id: number;
@@ -16,6 +17,7 @@ function formatCurrency(n: number) {
 }
 
 export function QuotationTemplate() {
+  const requireAuthAction = useRequireAuthAction();
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [validTill, setValidTill] = useState<string>(() => {
@@ -208,7 +210,7 @@ export function QuotationTemplate() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={handlePrint}
+              onClick={() => requireAuthAction(handlePrint)}
               className="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-xs font-semibold text-gray-800 dark:text-gray-100 hover:border-[#F97316] hover:text-[#F97316]"
             >
               <Printer className="w-4 h-4" />
@@ -216,7 +218,7 @@ export function QuotationTemplate() {
             </button>
             <button
               type="button"
-              onClick={handleWhatsApp}
+              onClick={() => requireAuthAction(handleWhatsApp)}
               className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#1ebc59] text-white px-4 py-2.5 text-xs font-semibold"
             >
               <MessageCircle className="w-4 h-4" />

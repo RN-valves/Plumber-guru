@@ -19,13 +19,13 @@ const FOOTER_COLUMNS = [
       { label: "Training Courses", href: "/training" },
       { label: "Plumbing Tools", href: "/tools" },
       { label: "Job Board", href: "/jobs" },
-      { label: "Community Forum", href: "/forum" },
+      { label: "Community Forum", href: "/community" },
     ],
   },
   {
     title: "For Plumbers",
     links: [
-      { label: "Register as Plumber", href: "/register" },
+      { label: "Register as Plumber", href: "/auth/register" },
       { label: "My Dashboard", href: "/dashboard" },
       { label: "Get Certified", href: "/certification" },
       { label: "Skill Upgrades", href: "/training/skill-up" },

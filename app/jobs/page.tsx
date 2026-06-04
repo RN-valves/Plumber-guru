@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 import {
   Bookmark,
   BookmarkCheck,
@@ -286,6 +287,7 @@ function SectionTitle({
 }
 
 export default function JobsPage() {
+  const requireAuthAction = useRequireAuthAction();
   const [tab, setTab] = useState<Tab>("find");
 
   // Filters (Find Jobs)
@@ -651,9 +653,11 @@ export default function JobsPage() {
                               </div>
 
                               <button
-                                onClick={() =>
-                                  setSaved((prev) => ({ ...prev, [j.id]: !prev[j.id] }))
-                                }
+                                onClick={() => {
+                                  requireAuthAction(() =>
+                                    setSaved((prev) => ({ ...prev, [j.id]: !prev[j.id] })),
+                                  );
+                                }}
                                 className="p-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-orange-300 transition-colors"
                                 aria-label={isSaved ? "Unsave job" : "Save job"}
                               >
@@ -690,7 +694,14 @@ export default function JobsPage() {
                                 <button className="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-sm font-semibold text-gray-800 dark:text-gray-100 hover:border-[#F97316] hover:text-[#F97316] transition-colors">
                                   View Details
                                 </button>
-                                <button className="rounded-xl bg-[#F97316] hover:bg-[#ea580c] px-5 py-2.5 text-sm font-semibold text-white transition-colors">
+                                <button
+                                  onClick={() => {
+                                    requireAuthAction(() => {
+                                      // Job apply flow will be connected to backend.
+                                    });
+                                  }}
+                                  className="rounded-xl bg-[#F97316] hover:bg-[#ea580c] px-5 py-2.5 text-sm font-semibold text-white transition-colors"
+                                >
                                   Apply Now
                                 </button>
                               </div>
@@ -903,17 +914,19 @@ export default function JobsPage() {
                     </div>
                     <button
                       onClick={() => {
-                        // mock submit
-                        setPostForm({
-                          title: "",
-                          description: "",
-                          locationCity: "",
-                          locationArea: "",
-                          salaryPerDay: "1200",
-                          requiredSkills: [],
-                          contactPhone: "",
-                          jobType: "Contract",
-                          duration: "",
+                        requireAuthAction(() => {
+                          // Mock submit (post action is auth-gated).
+                          setPostForm({
+                            title: "",
+                            description: "",
+                            locationCity: "",
+                            locationArea: "",
+                            salaryPerDay: "1200",
+                            requiredSkills: [],
+                            contactPhone: "",
+                            jobType: "Contract",
+                            duration: "",
+                          });
                         });
                       }}
                       className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold px-6 py-3 transition-colors"

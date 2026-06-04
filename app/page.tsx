@@ -110,7 +110,7 @@ const FEATURES = [
     icon: Shield,
     title: "Health & Insurance",
     desc: "Affordable health cover and accident protection.",
-    href: "/insurance",
+    href: "/health-safety",
   },
 ];
 
@@ -226,7 +226,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/register"
+                href="/auth/register"
                 className="px-8 py-4 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-base transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:-translate-y-0.5 active:translate-y-0"
               >
                 Register as Plumber
@@ -369,7 +369,7 @@ export default function HomePage() {
 
           <FadeUp delay={0.4} className="text-center mt-12">
             <Link
-              href="/register"
+              href="/auth/register"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold rounded-xl transition-all shadow-md shadow-orange-300/30 hover:-translate-y-0.5"
             >
               Get Started Free <ChevronRight className="w-4 h-4" />
@@ -546,7 +546,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/register"
+                href="/auth/register"
                 className="px-10 py-4 rounded-xl bg-white text-[#F97316] font-bold text-base hover:bg-orange-50 transition-all shadow-xl shadow-orange-900/30 hover:-translate-y-0.5"
               >
                 Register as Plumber — Free

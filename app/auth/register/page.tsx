@@ -5,6 +5,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { OtpInput } from "@/components/auth/OtpInput";
+import { OTP_INPUT_LENGTH } from "@/lib/otp-config";
 import { Loader2, Phone } from "lucide-react";
 
 type RegisterTab = "plumber" | "customer";
@@ -37,11 +38,10 @@ export default function RegisterPage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [language, setLanguage] = useState("hi");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [devOtp, setDevOtp] = useState<string | null>(null);
+  const [otpError, setOtpError] = useState(false);
 
   const toggleSkill = (skill: string) => {
     setSkills((prev) =>
@@ -69,12 +69,14 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || "OTP bhejne mein problem aayi");
-        if (data.devOtp) setDevOtp(data.devOtp);
+        setError(
+          data.error?.includes("60 seconds")
+            ? "Thoda wait karo, 60 seconds baad try karo"
+            : data.error || "OTP bhejne mein problem aayi"
+        );
         return;
       }
       setOtpSent(true);
-      if (data.devOtp) setDevOtp(data.devOtp);
     } catch {
       setError("Network error. Dobara try karein.");
     } finally {
@@ -82,8 +84,9 @@ export default function RegisterPage() {
     }
   };
 
-  const verifyAndRegister = async () => {
+  const verifyAndRegister = async (otp: string) => {
     setError("");
+    setOtpError(false);
     setLoading(true);
     try {
       const result = await signIn("phone-otp", {
@@ -94,6 +97,7 @@ export default function RegisterPage() {
       });
 
       if (result?.error) {
+        setOtpError(true);
         setError("Galat OTP. Dobara try karein.");
         return;
       }
@@ -124,7 +128,6 @@ export default function RegisterPage() {
               onClick={() => {
                 setTab("plumber");
                 setOtpSent(false);
-                setOtp("");
               }}
               className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                 tab === "plumber"
@@ -139,7 +142,6 @@ export default function RegisterPage() {
               onClick={() => {
                 setTab("customer");
                 setOtpSent(false);
-                setOtp("");
               }}
               className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                 tab === "customer"
@@ -154,12 +156,6 @@ export default function RegisterPage() {
           {error && (
             <p className="mt-4 text-sm text-red-600 dark:text-red-400 text-center">
               {error}
-            </p>
-          )}
-
-          {devOtp && (
-            <p className="mt-3 text-xs text-center text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl px-3 py-2">
-              Dev OTP: <strong>{devOtp}</strong>
             </p>
           )}
 
@@ -266,11 +262,18 @@ export default function RegisterPage() {
                 <label className="text-xs font-semibold text-gray-700 dark:text-gray-200 block text-center mb-3">
                   OTP verify karein
                 </label>
-                <OtpInput value={otp} onChange={setOtp} disabled={loading} />
+                <OtpInput
+                  key={String(otpError)}
+                  length={OTP_INPUT_LENGTH}
+                  onComplete={verifyAndRegister}
+                  isLoading={loading}
+                  hasError={otpError}
+                  errorMessage={otpError ? error : undefined}
+                />
               </div>
             )}
 
-            {!otpSent ? (
+            {!otpSent && (
               <button
                 type="button"
                 onClick={sendOtp}
@@ -285,16 +288,6 @@ export default function RegisterPage() {
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 OTP bhejo
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={verifyAndRegister}
-                disabled={loading || otp.length !== 6}
-                className="w-full rounded-xl bg-[#F97316] hover:bg-[#ea580c] disabled:opacity-50 text-white font-semibold py-3 flex items-center justify-center gap-2"
-              >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                Account banayein
               </button>
             )}
           </div>

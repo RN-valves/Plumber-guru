@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Phone, Plus, Search, Upload, FileDown } from "lucide-react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 
 type Customer = {
   id: string;
@@ -20,6 +21,7 @@ function parseDate(value: string) {
 }
 
 export function CustomerDatabase() {
+  const requireAuthAction = useRequireAuthAction();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [sortDesc, setSortDesc] = useState(true);
@@ -136,7 +138,7 @@ export function CustomerDatabase() {
           </div>
           <button
             type="button"
-            onClick={handleExportCsv}
+            onClick={() => requireAuthAction(handleExportCsv)}
             className="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-2.5 text-xs font-semibold text-gray-800 dark:text-gray-100 hover:border-[#F97316] hover:text-[#F97316]"
           >
             <FileDown className="w-4 h-4" />
@@ -181,7 +183,7 @@ export function CustomerDatabase() {
           <div className="flex items-end">
             <button
               type="button"
-              onClick={handleAddCustomer}
+              onClick={() => requireAuthAction(handleAddCustomer)}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold text-xs px-4 py-2.5 w-full"
             >
               <Plus className="w-4 h-4" />
@@ -314,6 +316,11 @@ export function CustomerDatabase() {
                       </a>
                       <button
                         type="button"
+                        onClick={() => {
+                          requireAuthAction(() => {
+                            // Invoice creation flow can be added after backend integration.
+                          });
+                        }}
                         className="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 text-[10px] font-semibold text-gray-800 dark:text-gray-100 hover:border-[#F97316] hover:text-[#F97316]"
                       >
                         <Plus className="w-3 h-3 mr-1" />

@@ -3,6 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 import {
   BadgeCheck,
   BarChart3,
@@ -141,6 +142,7 @@ function PriceCard({
 }
 
 export default function BrandsPage() {
+  const requireAuthAction = useRequireAuthAction();
   type Inquiry = {
     companyName: string;
     brand: string;
@@ -494,6 +496,11 @@ export default function BrandsPage() {
                   </div>
                   <button
                     type="button"
+                    onClick={() => {
+                      requireAuthAction(() => {
+                        // Dealer submission will be connected to backend endpoint.
+                      });
+                    }}
                     className="mt-2 w-full rounded-xl bg-sky-700 hover:bg-sky-800 text-white font-semibold px-6 py-3 transition-colors"
                   >
                     Register dealership
@@ -571,6 +578,11 @@ export default function BrandsPage() {
                   </p>
                   <button
                     type="button"
+                    onClick={() => {
+                      requireAuthAction(() => {
+                        // Partnership inquiry submission will be connected to backend endpoint.
+                      });
+                    }}
                     className="rounded-xl bg-[#F97316] hover:bg-[#ea580c] text-white font-semibold px-7 py-3 transition-colors"
                   >
                     Send message

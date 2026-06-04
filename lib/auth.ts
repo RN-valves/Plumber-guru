@@ -2,10 +2,12 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import { ObjectId } from "mongodb";
 import { getDb, getMongoClientPromise } from "@/lib/mongodb";
-import { normalizePhone, verifyOtp, type OtpProfile } from "@/lib/otp";
+import { verifyPhoneOtpForSession } from "@/lib/otp-service";
 import type { UserRole } from "@/types/next-auth";
+
+const authSecret =
+  process.env.NEXTAUTH_SECRET || "dev-only-secret-change-before-production";
 
 function calcProfileComplete(user: {
   name?: string;
@@ -25,52 +27,9 @@ function calcProfileComplete(user: {
   if (user.name) score += 20;
   if (user.phone) score += 20;
   if (user.city) score += 20;
-  if (user.skills && user.skills.length > 0) score += 20;
-  score += 20; // language optional bonus
+  if (user.skills?.length) score += 20;
+  score += 20;
   return Math.min(100, score);
-}
-
-async function upsertUserFromOtp(
-  phone: string,
-  profile: OtpProfile | null,
-  fallbackRole: UserRole = "plumber",
-) {
-  const db = await getDb();
-  const users = db.collection("users");
-
-  const existing = await users.findOne({ phone });
-  const role = (profile?.role || fallbackRole) as UserRole;
-
-  if (existing) {
-    const updates: Record<string, unknown> = { updatedAt: new Date() };
-    if (profile?.name) updates.name = profile.name;
-    if (profile?.city) updates.city = profile.city;
-    if (profile?.skills?.length) updates.skills = profile.skills;
-    if (profile?.language) updates.language = profile.language;
-
-    await users.updateOne({ phone }, { $set: updates });
-    const updated = await users.findOne({ phone });
-    return updated!;
-  }
-
-  const doc = {
-    _id: new ObjectId(),
-    name: profile?.name || "Plumber Guru User",
-    phone,
-    email: `${phone}@plumber-guru.local`,
-    emailVerified: null,
-    image: null,
-    role,
-    city: profile?.city || "",
-    skills: profile?.skills || [],
-    language: profile?.language || "hi",
-    profileComplete: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  doc.profileComplete = calcProfileComplete(doc);
-  await users.insertOne(doc);
-  return doc;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -102,22 +61,25 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.otp) return null;
 
-        const phone = normalizePhone(credentials.phone);
-        const otp = credentials.otp.trim();
         const fallbackRole = (credentials.role as UserRole) || "plumber";
 
-        const { valid, profile } = await verifyOtp(phone, otp);
-        if (!valid) return null;
+        const result = await verifyPhoneOtpForSession(
+          credentials.phone,
+          credentials.otp,
+          fallbackRole
+        );
 
-        const userDoc = await upsertUserFromOtp(phone, profile ?? null, fallbackRole);
+        if (!result.success) {
+          return null;
+        }
 
         return {
-          id: userDoc._id.toString(),
-          name: userDoc.name as string,
-          email: userDoc.email as string,
-          phone: userDoc.phone as string,
-          role: userDoc.role as UserRole,
-          image: (userDoc.image as string) || null,
+          id: result.userId,
+          name: result.name || "Plumber Guru User",
+          email: `${result.phone}@plumber-guru.local`,
+          phone: result.phone,
+          role: result.role,
+          image: null,
         };
       },
     }),
@@ -135,6 +97,7 @@ export const authOptions: NextAuthOptions = {
               image: user.image,
               role: "customer",
               updatedAt: new Date(),
+              lastLogin: new Date(),
             },
             $setOnInsert: {
               phone: "",
@@ -142,10 +105,12 @@ export const authOptions: NextAuthOptions = {
               skills: [],
               language: "hi",
               profileComplete: 40,
+              isProfileComplete: false,
               createdAt: new Date(),
+              isActive: true,
             },
           },
-          { upsert: true },
+          { upsert: true }
         );
       }
       return true;
@@ -169,7 +134,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: authSecret,
 };
 
 export { calcProfileComplete };

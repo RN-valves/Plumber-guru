@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
+import { useRequireAuthAction } from "@/lib/requireAuthAction";
 import {
   Phone,
   Droplets,
@@ -122,6 +123,7 @@ const TROUBLE_VIDEOS = [
 ];
 
 export default function SupportPage() {
+  const requireAuthAction = useRequireAuthAction();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [form, setForm] = useState({
     problem: "",
@@ -340,7 +342,7 @@ export default function SupportPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                setSubmitted(true);
+                requireAuthAction(() => setSubmitted(true));
               }}
               className="rounded-3xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 p-6 sm:p-8 shadow-sm space-y-4"
             >
