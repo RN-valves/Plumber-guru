@@ -49,7 +49,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { AdminDashboardSkeleton } from "@/components/layout/skeletons";
 import { PIE_CHART_COLORS } from "@/lib/admin-constants";
-import { cn } from "@/lib/utils";
 import type {
   AdminStatsResponse,
   PlumbersListResponse,
