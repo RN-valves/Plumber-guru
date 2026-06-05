@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Wrench } from "lucide-react";
+import { ExternalLink, LogOut, Wrench } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { ADMIN_NAV } from "@/lib/admin-navigation";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -98,12 +99,30 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-gray-100 px-5 py-4 dark:border-gray-800">
+      <div className="shrink-0 space-y-3 border-t border-gray-100 px-4 py-4 dark:border-gray-800">
         <div className="rounded-xl bg-gray-50 p-3 dark:bg-gray-900">
           <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
             {adminName}
           </p>
           <p className="text-xs capitalize text-gray-500">{adminRole}</p>
+        </div>
+        <div className="space-y-1">
+          <Link
+            href="/"
+            onClick={onNavigate}
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
+          >
+            <ExternalLink className="size-4 shrink-0 opacity-70" />
+            View site
+          </Link>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex w-full items-center gap-2.5 rounded-xl border border-red-200/80 bg-red-50 px-3 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50"
+          >
+            <LogOut className="size-4 shrink-0" />
+            Sign out
+          </button>
         </div>
       </div>
     </div>

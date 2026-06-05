@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import {
   Bell,
+  ChevronDown,
   ExternalLink,
   LogOut,
   Menu,
@@ -18,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -241,7 +243,9 @@ export function TopBar({ onMenuClick, adminName, adminImage }: TopBarProps) {
           </Badge>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-80">
-          <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           {NOTIFICATIONS.map((item) => (
             <DropdownMenuItem key={item.id} className="flex flex-col items-start gap-0.5 p-3">
@@ -265,7 +269,7 @@ export function TopBar({ onMenuClick, adminName, adminImage }: TopBarProps) {
             <button
               type="button"
               className={cn(
-                "flex shrink-0 items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                "flex shrink-0 items-center gap-2 rounded-full border border-gray-200/80 bg-white py-1 pl-1 pr-2.5 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-ring dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800"
               )}
               aria-label="Admin account menu"
             />
@@ -279,17 +283,23 @@ export function TopBar({ onMenuClick, adminName, adminImage }: TopBarProps) {
               {initials(displayName)}
             </AvatarFallback>
           </Avatar>
+          <span className="hidden max-w-[7rem] truncate text-sm font-medium text-gray-900 dark:text-white sm:inline">
+            {displayName}
+          </span>
+          <ChevronDown className="hidden size-4 shrink-0 text-muted-foreground sm:block" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
-          <DropdownMenuLabel className="font-normal">
-            <p className="text-sm font-medium">{displayName}</p>
-            <p className="text-xs text-muted-foreground">Administrator</p>
-          </DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="font-normal">
+              <p className="truncate text-sm font-medium">{displayName}</p>
+              <p className="text-xs text-muted-foreground">Administrator</p>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Link href="/" className="flex w-full items-center gap-2">
               <ExternalLink className="size-4" />
-              View Site
+              View site
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
@@ -304,10 +314,11 @@ export function TopBar({ onMenuClick, adminName, adminImage }: TopBarProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
+            className="cursor-pointer"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="size-4" />
-            Logout
+            Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

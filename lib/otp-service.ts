@@ -17,18 +17,18 @@ export type SendOtpResult =
 
 export type VerifyOtpResult =
   | {
-      success: true;
-      userId: string;
-      isNewUser: boolean;
-      role: UserRole;
-      name?: string;
-      phone: string;
-    }
+    success: true;
+    userId: string;
+    isNewUser: boolean;
+    role: UserRole;
+    name?: string;
+    phone: string;
+  }
   | {
-      success: false;
-      error: string;
-      attemptsLeft?: number;
-    };
+    success: false;
+    error: string;
+    attemptsLeft?: number;
+  };
 
 function calcProfileComplete(user: {
   name?: string;

@@ -165,11 +165,10 @@ export default function LoginPage() {
                 setError("");
                 setOtpError(false);
               }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                tab === "plumber"
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${tab === "plumber"
                   ? "bg-white dark:bg-gray-950 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-300"
-              }`}
+                }`}
             >
               Plumber Login
             </button>
@@ -181,11 +180,10 @@ export default function LoginPage() {
                 setError("");
                 setOtpError(false);
               }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                tab === "customer"
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${tab === "customer"
                   ? "bg-white dark:bg-gray-950 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-300"
-              }`}
+                }`}
             >
               Customer Login
             </button>
