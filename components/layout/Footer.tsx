@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wrench } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 
 const FOOTER_COLUMNS = [
   {
@@ -74,12 +74,7 @@ export function Footer() {
       <div className="container-pg pt-14 pb-8">
         {/* Brand + Tagline */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center gap-4">
-          <Link href="/" className="flex items-center gap-2" aria-label="Plumber Guru Home">
-            <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#F97316]">
-              <Wrench className="w-5 h-5 text-white" strokeWidth={2.5} />
-            </span>
-            <span className="font-bold text-xl text-[#F97316]">Plumber Guru</span>
-          </Link>
+          <Logo href="/" imageClassName="h-14 sm:h-16 sm:max-w-[320px]" />
           <span className="hidden sm:block text-gray-600">|</span>
           <p className="text-gray-400 text-sm font-medium italic">
             Made for India&apos;s Plumbers — भारत के प्लंबरों के लिए बनाया गया

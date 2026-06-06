@@ -1,36 +1,30 @@
 import type { MetadataRoute } from "next";
+import {
+  LOCALE_HOME_PREFIXES,
+  PAGE_SEO,
+  PUBLIC_SITEMAP_PAGES,
+} from "@/lib/seo";
+import { getSiteSettings } from "@/lib/site-settings";
 
-const BASE_URL = "https://plumber-guru.com";
-
-const HIGH_PRIORITY = ["/training", "/jobs"];
-const STANDARD_ROUTES = [
-  "/",
-  "/tools",
-  "/find-plumber",
-  "/support",
-  "/community",
-  "/health-safety",
-  "/brands",
-  "/about",
-  "/auth/login",
-  "/auth/register",
-];
-
-const LOCALE_PREFIXES = ["/hi", "/te", "/ta", "/kn"];
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const settings = await getSiteSettings();
+  const siteUrl = settings.seo.siteUrl.replace(/\/$/, "");
   const now = new Date();
+  const entries: MetadataRoute.Sitemap = [];
 
-  const entries: MetadataRoute.Sitemap = STANDARD_ROUTES.map((path) => ({
-    url: `${BASE_URL}${path}`,
-    lastModified: now,
-    changeFrequency: path === "/" ? "daily" : "weekly",
-    priority: path === "/" ? 1.0 : HIGH_PRIORITY.includes(path) ? 0.9 : 0.7,
-  }));
-
-  for (const prefix of LOCALE_PREFIXES) {
+  for (const key of PUBLIC_SITEMAP_PAGES) {
+    const page = PAGE_SEO[key];
     entries.push({
-      url: `${BASE_URL}${prefix}`,
+      url: `${siteUrl}${page.path === "/" ? "" : page.path}`,
+      lastModified: now,
+      changeFrequency: page.changeFrequency ?? "weekly",
+      priority: page.priority ?? 0.7,
+    });
+  }
+
+  for (const locale of LOCALE_HOME_PREFIXES) {
+    entries.push({
+      url: `${siteUrl}/${locale}`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,

@@ -3,6 +3,14 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  getRootMetadata,
+  organizationJsonLd,
+  webPageJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
+import { getSeoContext } from "@/lib/site-settings";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,45 +19,28 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Plumber Guru — India's #1 Plumber Platform",
-  description:
-    "Plumber Guru — भारत का नंबर 1 प्लंबर प्लेटफॉर्म। Find certified plumbers, get training, jobs, and tools. भारत के प्लंबरों के लिए बनाया गया।",
-  keywords: [
-    "plumber",
-    "plumbing",
-    "India",
-    "प्लंबर",
-    "प्लंबिंग",
-    "plumber training",
-    "plumber jobs",
-    "find plumber",
-  ],
-  metadataBase: new URL("https://plumber-guru.com"),
-  openGraph: {
-    title: "Plumber Guru — India's #1 Plumber Platform",
-    description:
-      "भारत का नंबर 1 प्लंबर प्लेटफॉर्म | India's #1 platform for plumbers — training, jobs, and tools.",
-    url: "https://plumber-guru.com",
-    siteName: "Plumber Guru",
-    locale: "en_IN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Plumber Guru — India's #1 Plumber Platform",
-    description:
-      "भारत का नंबर 1 प्लंबर प्लेटफॉर्म | Training, Jobs & Tools for Indian Plumbers.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getRootMetadata();
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const ctx = await getSeoContext();
+
   return (
-    <html lang="hi" suppressHydrationWarning className={inter.variable}>
+    <html lang="en-IN" suppressHydrationWarning className={inter.variable}>
+      <head>
+        <JsonLd
+          data={[
+            organizationJsonLd(ctx),
+            websiteJsonLd(ctx),
+            webPageJsonLd("home", undefined, ctx),
+          ]}
+        />
+      </head>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"

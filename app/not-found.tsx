@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Home, LayoutDashboard, Shield, Wrench } from "lucide-react";
+import { getPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("notFound", { noIndex: true });
+}
 
 export default function NotFound() {
   return (

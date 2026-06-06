@@ -25,7 +25,11 @@ function getMissingFields(user: {
   return missing;
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: { login?: string };
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -93,7 +97,9 @@ export default async function DashboardPage() {
   }
 
   if (session.user.role === "admin") {
-    redirect("/admin");
+    const loginSuccess =
+      searchParams?.login === "success" ? "?login=success" : "";
+    redirect(`/admin${loginSuccess}`);
   }
 
   return (

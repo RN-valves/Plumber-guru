@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, LogOut, Wrench } from "lucide-react";
+import { ExternalLink, LogOut } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { signOut } from "next-auth/react";
 import { ADMIN_NAV } from "@/lib/admin-navigation";
 import { Badge } from "@/components/ui/badge";
@@ -38,13 +39,8 @@ export function Sidebar({
       )}
     >
       <div className="flex h-16 shrink-0 items-center gap-3 border-b border-gray-100 px-5 dark:border-gray-800">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30">
-          <Wrench className="size-5" strokeWidth={2.5} />
-        </div>
+        <Logo href="/" imageClassName="h-10 max-w-[200px] sm:h-11 sm:max-w-[220px]" />
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
-            Plumber Guru
-          </p>
           <p className="text-[11px] font-medium text-gray-500">Admin Panel</p>
         </div>
       </div>

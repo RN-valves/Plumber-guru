@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wrench, Menu, X, ChevronDown, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { LOCALES, type Locale, getLocaleLabel } from "@/lib/locale";
 
 const NAV_LINKS = [
@@ -80,18 +81,10 @@ export function Navbar() {
       >
         <div className="container-pg">
           <div className="flex h-16 items-center justify-between gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 shrink-0"
-              aria-label="Plumber Guru Home"
-            >
-              <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary-500">
-                <Wrench className="w-5 h-5 text-white" strokeWidth={2.5} />
-              </span>
-              <span className="font-bold text-xl tracking-tight text-[#F97316]">
-                Plumber Guru
-              </span>
-            </Link>
+            <Logo
+              priority
+              imageClassName="h-14 max-w-none sm:h-[3.75rem] lg:h-16"
+            />
 
             <nav
               className="hidden lg:flex items-center gap-0.5"

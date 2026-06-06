@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Save, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { Loader2, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,33 +12,91 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import {
-  DEFAULT_HOMEPAGE,
-  DEFAULT_PAYMENT,
-  DEFAULT_SITE_SETTINGS,
-  NOTIFICATION_EVENTS,
-} from "@/lib/admin-settings-mock";
+import { SeoSettingsTab } from "@/components/admin/SeoSettingsTab";
+import { NOTIFICATION_EVENTS } from "@/lib/admin-settings-mock";
+import { getDefaultSiteSettings } from "@/lib/site-settings-defaults";
+import type { SiteSettingsDocument } from "@/types/site-settings";
+
+async function fetcher(url: string): Promise<SiteSettingsDocument> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error || `Request failed (${res.status})`
+    );
+  }
+  return res.json() as Promise<SiteSettingsDocument>;
+}
 
 export default function SiteSettingsPage() {
-  const [saved, setSaved] = useState(false);
-  const [general, setGeneral] = useState(DEFAULT_SITE_SETTINGS);
-  const [notifEnabled, setNotifEnabled] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(
-      NOTIFICATION_EVENTS.map((e) => [e.id, e.defaultEnabled])
-    )
+  const { data, error, isLoading, mutate } = useSWR(
+    "/api/admin/settings",
+    fetcher
   );
-  const [templates, setTemplates] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      NOTIFICATION_EVENTS.map((e) => [e.templateKey, e.defaultTemplate])
-    )
-  );
-  const [homepage, setHomepage] = useState(DEFAULT_HOMEPAGE);
-  const [newCity, setNewCity] = useState("");
-  const [payment, setPayment] = useState(DEFAULT_PAYMENT);
+  const defaults = getDefaultSiteSettings();
 
-  function handleSave() {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const [general, setGeneral] = useState(defaults.general);
+  const [seo, setSeo] = useState(defaults.seo);
+  const [homepage, setHomepage] = useState(defaults.homepage);
+  const [payment, setPayment] = useState(defaults.payment);
+  const [notifEnabled, setNotifEnabled] = useState(defaults.notifications.enabled);
+  const [templates, setTemplates] = useState(defaults.notifications.templates);
+  const [newCity, setNewCity] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    if (!data) return;
+    setGeneral(data.general);
+    setSeo(data.seo);
+    setHomepage(data.homepage);
+    setPayment(data.payment);
+    setNotifEnabled(data.notifications.enabled);
+    setTemplates(data.notifications.templates);
+  }, [data]);
+
+  async function handleSave(
+    section: "general" | "seo" | "homepage" | "notifications" | "payment"
+  ) {
+    setSaving(true);
+    setSaveError("");
+    setSaved(false);
+
+    const payload = {
+      general: section === "general" ? general : undefined,
+      seo: section === "seo" ? seo : undefined,
+      homepage: section === "homepage" ? homepage : undefined,
+      notifications:
+        section === "notifications"
+          ? { enabled: notifEnabled, templates }
+          : undefined,
+      payment: section === "payment" ? payment : undefined,
+    };
+
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(
+          (body as { error?: string }).error || "Failed to save settings"
+        );
+      }
+
+      const updated = (await res.json()) as SiteSettingsDocument;
+      await mutate(updated, false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function addCity() {
@@ -57,25 +116,56 @@ export default function SiteSettingsPage() {
     }));
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+        Loading settings…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+        Failed to load settings: {error.message}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Site Settings</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Configure platform-wide options for Plumber Guru
+            Configure platform-wide options and SEO for Plumber Guru
           </p>
+          {data?.updatedAt ? (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Last saved: {new Date(data.updatedAt).toLocaleString("en-IN")}
+              {data.updatedBy ? ` by ${data.updatedBy}` : ""}
+            </p>
+          ) : null}
         </div>
-        {saved && (
-          <Badge className="bg-green-600">Settings saved successfully</Badge>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {saved ? (
+            <Badge className="bg-green-600">Settings saved successfully</Badge>
+          ) : null}
+          {saveError ? (
+            <Badge variant="destructive">{saveError}</Badge>
+          ) : null}
+        </div>
       </div>
 
-      <Tabs defaultValue="general" className="w-full">
+      <Tabs defaultValue="seo" className="w-full">
         <TabsList
           variant="line"
           className="h-auto w-full max-w-none flex-wrap justify-start gap-0 rounded-none border-b border-border bg-transparent p-0"
         >
+          <TabsTrigger value="seo" className="px-4 py-2.5">
+            SEO
+          </TabsTrigger>
           <TabsTrigger value="general" className="px-4 py-2.5">
             General
           </TabsTrigger>
@@ -89,6 +179,15 @@ export default function SiteSettingsPage() {
             Payment
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="seo" className="mt-6 space-y-6">
+          <SeoSettingsTab seo={seo} onChange={setSeo} />
+          <SaveBar
+            onSave={() => handleSave("seo")}
+            saving={saving}
+            label="Save SEO settings"
+          />
+        </TabsContent>
 
         <TabsContent value="general" className="mt-6 space-y-6">
           <Card className="w-full">
@@ -203,7 +302,11 @@ export default function SiteSettingsPage() {
               </div>
             </CardContent>
           </Card>
-          <SaveBar onSave={handleSave} />
+          <SaveBar
+            onSave={() => handleSave("general")}
+            saving={saving}
+            label="Save general settings"
+          />
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-6 space-y-4">
@@ -251,7 +354,11 @@ export default function SiteSettingsPage() {
               </CardContent>
             </Card>
           ))}
-          <SaveBar onSave={handleSave} />
+          <SaveBar
+            onSave={() => handleSave("notifications")}
+            saving={saving}
+            label="Save notification settings"
+          />
         </TabsContent>
 
         <TabsContent value="homepage" className="mt-6 space-y-4">
@@ -357,7 +464,11 @@ export default function SiteSettingsPage() {
               </div>
             </CardContent>
           </Card>
-          <SaveBar onSave={handleSave} />
+          <SaveBar
+            onSave={() => handleSave("homepage")}
+            saving={saving}
+            label="Save homepage settings"
+          />
         </TabsContent>
 
         <TabsContent value="payment" className="mt-6 space-y-4">
@@ -377,9 +488,6 @@ export default function SiteSettingsPage() {
                     setPayment((p) => ({ ...p, razorpayKey: e.target.value }))
                   }
                 />
-                <p className="text-xs text-muted-foreground">
-                  Used for plumber certification and brand partnership payments
-                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="commission">Job lead commission (%)</Label>
@@ -439,19 +547,35 @@ export default function SiteSettingsPage() {
               </div>
             </CardContent>
           </Card>
-          <SaveBar onSave={handleSave} />
+          <SaveBar
+            onSave={() => handleSave("payment")}
+            saving={saving}
+            label="Save payment settings"
+          />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function SaveBar({ onSave }: { onSave: () => void }) {
+function SaveBar({
+  onSave,
+  saving,
+  label,
+}: {
+  onSave: () => void;
+  saving: boolean;
+  label: string;
+}) {
   return (
     <div className="sticky bottom-0 flex justify-end border-t border-border bg-gray-50/95 py-4 backdrop-blur dark:bg-gray-900/95">
-      <Button className="gap-2" onClick={onSave}>
-        <Save className="size-4" />
-        Save Changes
+      <Button className="gap-2" onClick={onSave} disabled={saving}>
+        {saving ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Save className="size-4" />
+        )}
+        {saving ? "Saving…" : label}
       </Button>
     </div>
   );

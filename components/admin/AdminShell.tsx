@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { LoginSuccessBanner } from "@/components/auth/LoginSuccessBanner";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { TopBar } from "@/components/admin/TopBar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -52,6 +53,9 @@ export function AdminShell({
           adminName={adminName}
           adminImage={adminImage}
         />
+        <Suspense fallback={null}>
+          <LoginSuccessBanner />
+        </Suspense>
         <main className="flex-1 overflow-y-auto p-4 md:p-8">{children}</main>
       </div>
     </div>

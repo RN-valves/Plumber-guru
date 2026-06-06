@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+  appendLoginSuccessParam,
+  markLoginSuccess,
+} from "@/components/auth/LoginSuccessBanner";
 import { OtpInput } from "@/components/auth/OtpInput";
 import { OTP_INPUT_LENGTH } from "@/lib/otp-config";
 import { useOtpTimer } from "@/hooks/useOtpTimer";
@@ -125,6 +129,7 @@ export default function LoginPage() {
         return;
       }
 
+      markLoginSuccess();
       router.push(callbackUrl);
       router.refresh();
     } catch {
@@ -140,7 +145,7 @@ export default function LoginPage() {
   };
 
   const handleGoogle = () => {
-    signIn("google", { callbackUrl });
+    signIn("google", { callbackUrl: appendLoginSuccessParam(callbackUrl) });
   };
 
   const phoneValid = normalizedPhone.length === 10;

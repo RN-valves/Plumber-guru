@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { getPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("admin", { noIndex: true });
+}
 
 export default async function AdminLayout({
   children,
