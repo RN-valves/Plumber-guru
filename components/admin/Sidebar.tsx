@@ -6,12 +6,15 @@ import { ExternalLink, LogOut } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { signOut } from "next-auth/react";
 import { ADMIN_NAV } from "@/lib/admin-navigation";
+import { filterAdminNav } from "@/lib/admin-permissions";
+import type { AdminAccessProfile } from "@/types/admin-permissions";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type SidebarProps = {
   adminName: string;
   adminRole: string;
+  access: AdminAccessProfile;
   onNavigate?: () => void;
   className?: string;
 };
@@ -26,6 +29,7 @@ function isActivePath(pathname: string, href: string) {
 export function Sidebar({
   adminName,
   adminRole,
+  access,
   onNavigate,
   className,
 }: SidebarProps) {
@@ -46,13 +50,17 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-5">
-        {ADMIN_NAV.map((section) => (
+        {ADMIN_NAV.map((section) => {
+          const items = filterAdminNav(section.items, access);
+          if (items.length === 0) return null;
+
+          return (
           <div key={section.title} className="mb-6 last:mb-0">
             <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
               {section.title}
             </p>
             <ul className="space-y-1">
-              {section.items.map((item) => {
+              {items.map((item) => {
                 const active = isActivePath(pathname, item.href);
                 const Icon = item.icon;
                 return (
@@ -92,7 +100,8 @@ export function Sidebar({
               })}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="shrink-0 space-y-3 border-t border-gray-100 px-4 py-4 dark:border-gray-800">

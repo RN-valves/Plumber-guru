@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin, plumberBaseFilter } from "@/lib/admin-auth";
+import { requireAdminPermission, plumberBaseFilter } from "@/lib/admin-auth";
 import { getDb } from "@/lib/mongodb";
 import {
   fillRegistrationDays,
@@ -11,7 +11,7 @@ import type { AdminStatsResponse } from "@/types/admin-api";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("dashboard.view");
   if (auth.error) return auth.error;
 
   try {

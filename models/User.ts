@@ -17,6 +17,10 @@ export interface IUser {
   isActive: boolean;
   verified?: boolean;
   image?: string | null;
+  adminRole?: "super_admin" | "content_manager" | "support_agent" | "city_manager";
+  adminPermissions?: string[];
+  assignedCity?: string | null;
+  adminStatus?: "active" | "invited" | "suspended";
 }
 
 const UserSchema = new Schema<IUser>(
@@ -39,6 +43,17 @@ const UserSchema = new Schema<IUser>(
     isActive: { type: Boolean, default: true },
     verified: { type: Boolean, default: false },
     image: { type: String, default: null },
+    adminRole: {
+      type: String,
+      enum: ["super_admin", "content_manager", "support_agent", "city_manager"],
+    },
+    adminPermissions: { type: [String], default: [] },
+    assignedCity: { type: String, default: null },
+    adminStatus: {
+      type: String,
+      enum: ["active", "invited", "suspended"],
+      default: "active",
+    },
   },
   { collection: "users" }
 );

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { formatDate } from "@/lib/admin-serialize";
 import { getDb } from "@/lib/mongodb";
 import type { Document } from "mongodb";
@@ -31,7 +31,7 @@ function serializeJob(doc: Document): JobListItem {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("jobs.view");
   if (auth.error) return auth.error;
 
   const { searchParams } = req.nextUrl;
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("jobs.view");
   if (auth.error) return auth.error;
 
   let body: JobPatchBody;
@@ -157,7 +157,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("jobs.view");
   if (auth.error) return auth.error;
 
   const id = req.nextUrl.searchParams.get("id");

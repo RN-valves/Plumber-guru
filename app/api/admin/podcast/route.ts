@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { formatDate } from "@/lib/admin-serialize";
 import { getDb } from "@/lib/mongodb";
 import type { Document } from "mongodb";
@@ -29,7 +29,7 @@ function serializeEpisode(doc: Document): PodcastEpisode {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("content.podcast");
   if (auth.error) return auth.error;
 
   const { searchParams } = req.nextUrl;
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("content.podcast");
   if (auth.error) return auth.error;
 
   let body: Record<string, unknown>;

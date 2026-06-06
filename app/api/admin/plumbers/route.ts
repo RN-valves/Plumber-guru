@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import { requireAdmin, plumberBaseFilter } from "@/lib/admin-auth";
+import { requireAdminPermission, plumberBaseFilter } from "@/lib/admin-auth";
 import { serializePlumberListItem } from "@/lib/admin-serialize";
 import { getDb } from "@/lib/mongodb";
 import type {
@@ -17,7 +17,7 @@ function parseVerifiedParam(value: string | null): boolean | undefined {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("plumbers.view");
   if (auth.error) return auth.error;
 
   const { searchParams } = req.nextUrl;
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("plumbers.view");
   if (auth.error) return auth.error;
 
   let body: PlumberBulkPatchBody;

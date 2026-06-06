@@ -3,7 +3,10 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminPermissionGuard } from "@/components/admin/AdminPermissionGuard";
 import { getPageMetadata } from "@/lib/seo";
+import { formatAdminRoleLabel } from "@/lib/admin-permissions";
+import { getAdminAccessByUserId } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
@@ -22,16 +25,23 @@ export default async function AdminLayout({
     redirect("/");
   }
 
+  const access = await getAdminAccessByUserId(session.user.id);
+
+  if (access.adminStatus === "suspended") {
+    redirect("/auth/login?error=AccountSuspended");
+  }
+
   const adminName = session.user.name || "Admin";
-  const adminRole = session.user.role || "admin";
+  const adminRoleLabel = formatAdminRoleLabel(access.adminRole);
 
   return (
     <AdminShell
       adminName={adminName}
-      adminRole={adminRole}
+      adminRole={adminRoleLabel}
       adminImage={session.user.image}
+      access={access}
     >
-      {children}
+      <AdminPermissionGuard access={access}>{children}</AdminPermissionGuard>
     </AdminShell>
   );
 }

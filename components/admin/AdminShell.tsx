@@ -5,12 +5,14 @@ import { LoginSuccessBanner } from "@/components/auth/LoginSuccessBanner";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { TopBar } from "@/components/admin/TopBar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import type { AdminAccessProfile } from "@/types/admin-permissions";
 
 type AdminShellProps = {
   children: React.ReactNode;
   adminName: string;
   adminRole: string;
   adminImage?: string | null;
+  access: AdminAccessProfile;
 };
 
 export function AdminShell({
@@ -18,6 +20,7 @@ export function AdminShell({
   adminName,
   adminRole,
   adminImage,
+  access,
 }: AdminShellProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -28,7 +31,7 @@ export function AdminShell({
         aria-hidden
       />
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[260px] lg:block lg:shadow-xl lg:shadow-black/5">
-        <Sidebar adminName={adminName} adminRole={adminRole} />
+        <Sidebar adminName={adminName} adminRole={adminRole} access={access} />
       </aside>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -41,6 +44,7 @@ export function AdminShell({
           <Sidebar
             adminName={adminName}
             adminRole={adminRole}
+            access={access}
             onNavigate={() => setMobileNavOpen(false)}
             className="border-r-0"
           />

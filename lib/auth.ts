@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { getDb, getMongoClientPromise } from "@/lib/mongodb";
 import { verifyPhoneOtpForSession } from "@/lib/otp-service";
+import { getAdminAccessByUserId } from "@/lib/admin-users";
 import type { UserRole } from "@/types/next-auth";
 
 const authSecret =
@@ -73,6 +74,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const adminAccess =
+          result.role === "admin"
+            ? await getAdminAccessByUserId(result.userId)
+            : null;
+
+        if (adminAccess?.adminStatus === "suspended") {
+          return null;
+        }
+
         return {
           id: result.userId,
           name: result.name || "Plumber Guru User",
@@ -80,6 +90,10 @@ export const authOptions: NextAuthOptions = {
           phone: result.phone,
           role: result.role,
           image: null,
+          adminRole: adminAccess?.adminRole,
+          adminPermissions: adminAccess?.permissions,
+          assignedCity: adminAccess?.assignedCity,
+          adminStatus: adminAccess?.adminStatus,
         };
       },
     }),
@@ -121,7 +135,20 @@ export const authOptions: NextAuthOptions = {
         token.phone = user.phone;
         token.role = user.role;
         token.name = user.name;
+        token.adminRole = user.adminRole;
+        token.adminPermissions = user.adminPermissions;
+        token.assignedCity = user.assignedCity;
+        token.adminStatus = user.adminStatus;
       }
+
+      if (token.role === "admin" && token.userId) {
+        const access = await getAdminAccessByUserId(token.userId as string);
+        token.adminRole = access.adminRole;
+        token.adminPermissions = access.permissions;
+        token.assignedCity = access.assignedCity;
+        token.adminStatus = access.adminStatus;
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -129,6 +156,10 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.userId as string;
         session.user.phone = token.phone as string;
         session.user.role = token.role as UserRole;
+        session.user.adminRole = token.adminRole;
+        session.user.adminPermissions = token.adminPermissions;
+        session.user.assignedCity = token.assignedCity ?? null;
+        session.user.adminStatus = token.adminStatus;
         if (token.name) session.user.name = token.name as string;
       }
       return session;

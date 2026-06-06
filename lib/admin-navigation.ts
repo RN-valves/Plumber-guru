@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { AdminPermission } from "@/types/admin-permissions";
 import {
   AlertTriangle,
   BarChart3,
@@ -25,6 +26,7 @@ export type AdminNavItem = {
   href: string;
   icon: LucideIcon;
   badge?: number;
+  permission: AdminPermission;
 };
 
 export type AdminNavSection = {
@@ -36,33 +38,60 @@ export const ADMIN_NAV: AdminNavSection[] = [
   {
     title: "OVERVIEW",
     items: [
-      { label: "Dashboard", href: "/admin", icon: Home },
-      { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { label: "Dashboard", href: "/admin", icon: Home, permission: "dashboard.view" },
+      {
+        label: "Analytics",
+        href: "/admin/analytics",
+        icon: BarChart3,
+        permission: "analytics.view",
+      },
     ],
   },
   {
     title: "PLUMBERS",
     items: [
-      { label: "All Plumbers", href: "/admin/plumbers", icon: Users },
+      {
+        label: "All Plumbers",
+        href: "/admin/plumbers",
+        icon: Users,
+        permission: "plumbers.view",
+      },
       {
         label: "Verify Plumbers",
         href: "/admin/plumbers/verify",
         icon: Shield,
         badge: 3,
+        permission: "plumbers.verify",
       },
       {
         label: "Reported Plumbers",
         href: "/admin/plumbers/reported",
         icon: Flag,
+        permission: "plumbers.reported",
       },
     ],
   },
   {
     title: "JOBS & LEADS",
     items: [
-      { label: "All Jobs", href: "/admin/jobs", icon: Briefcase },
-      { label: "Customer Leads", href: "/admin/leads", icon: Target },
-      { label: "Job Reports", href: "/admin/jobs/reports", icon: FileText },
+      {
+        label: "All Jobs",
+        href: "/admin/jobs",
+        icon: Briefcase,
+        permission: "jobs.view",
+      },
+      {
+        label: "Customer Leads",
+        href: "/admin/leads",
+        icon: Target,
+        permission: "leads.view",
+      },
+      {
+        label: "Job Reports",
+        href: "/admin/jobs/reports",
+        icon: FileText,
+        permission: "jobs.reports",
+      },
     ],
   },
   {
@@ -72,16 +101,19 @@ export const ADMIN_NAV: AdminNavSection[] = [
         label: "Training Videos",
         href: "/admin/training",
         icon: Video,
+        permission: "content.training",
       },
       {
         label: "Podcast Episodes",
         href: "/admin/podcast",
         icon: Mic,
+        permission: "content.podcast",
       },
       {
         label: "Blog / SEO Posts",
         href: "/admin/blog",
         icon: Edit3,
+        permission: "content.blog",
       },
     ],
   },
@@ -92,11 +124,13 @@ export const ADMIN_NAV: AdminNavSection[] = [
         label: "Invoice Logs",
         href: "/admin/finance/invoices",
         icon: Receipt,
+        permission: "finance.invoices",
       },
       {
         label: "GST Reports",
         href: "/admin/finance/gst",
         icon: Calculator,
+        permission: "finance.gst",
       },
     ],
   },
@@ -108,11 +142,13 @@ export const ADMIN_NAV: AdminNavSection[] = [
         href: "/admin/community/forum",
         icon: MessageSquare,
         badge: 7,
+        permission: "community.forum",
       },
       {
         label: "Reported Content",
         href: "/admin/community/reported",
         icon: AlertTriangle,
+        permission: "community.reported",
       },
     ],
   },
@@ -123,12 +159,19 @@ export const ADMIN_NAV: AdminNavSection[] = [
         label: "Site Settings",
         href: "/admin/settings",
         icon: Settings,
+        permission: "settings.site",
       },
-      { label: "Admin Users", href: "/admin/admins", icon: UserCog },
+      {
+        label: "Admin Users",
+        href: "/admin/admins",
+        icon: UserCog,
+        permission: "settings.admins",
+      },
       {
         label: "SMS / Notification Logs",
         href: "/admin/notifications",
         icon: Bell,
+        permission: "settings.notifications",
       },
     ],
   },

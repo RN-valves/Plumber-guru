@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin, plumberBaseFilter } from "@/lib/admin-auth";
+import { requireAdminPermission, plumberBaseFilter } from "@/lib/admin-auth";
 import { parseObjectId, serializePlumberDetail } from "@/lib/admin-serialize";
 import { getDb } from "@/lib/mongodb";
 
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 type RouteContext = { params: { id: string } };
 
 export async function GET(_req: NextRequest, { params }: RouteContext) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("plumbers.view");
   if (auth.error) return auth.error;
 
   const oid = parseObjectId(params.id);
@@ -59,7 +59,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteContext) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("plumbers.view");
   if (auth.error) return auth.error;
 
   const oid = parseObjectId(params.id);
@@ -128,7 +128,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: RouteContext) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("plumbers.view");
   if (auth.error) return auth.error;
 
   const oid = parseObjectId(params.id);

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { getSiteSettings, saveSiteSettings } from "@/lib/site-settings";
 import type { SiteSettingsPatch } from "@/types/site-settings";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("settings.site");
   if (auth.error) return auth.error;
 
   try {
@@ -22,7 +22,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("settings.site");
   if (auth.error) return auth.error;
 
   try {

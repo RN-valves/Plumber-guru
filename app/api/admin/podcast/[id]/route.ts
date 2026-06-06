@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
 import { parseObjectId, formatDate } from "@/lib/admin-serialize";
 import { getDb } from "@/lib/mongodb";
 import type { Document } from "mongodb";
@@ -31,7 +31,7 @@ function serializeEpisode(doc: Document): PodcastEpisode {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteContext) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("content.podcast");
   if (auth.error) return auth.error;
 
   const oid = parseObjectId(params.id);
@@ -93,7 +93,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: RouteContext) {
-  const auth = await requireAdmin();
+  const auth = await requireAdminPermission("content.podcast");
   if (auth.error) return auth.error;
 
   const oid = parseObjectId(params.id);
